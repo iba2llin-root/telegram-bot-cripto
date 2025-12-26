@@ -43,3 +43,5 @@ async def crypto(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Ошибка при получении курсов")
 
 app = ApplicationBu
+ 
+ 
