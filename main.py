@@ -32,5 +32,11 @@ app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("crypto", crypto))
 
+
+app = ApplicationBu
+ 
+ 
+
 print("Бот запущен...")
 app.run_polling()
+
