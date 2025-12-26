@@ -1,45 +1,36 @@
-import aiohttp
+import requests
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
 TOKEN = "ТОКЕН_ОТ_BOTFATHER"
 
-async def get_crypto_prices():
+def get_crypto_prices():
     url = "https://api.coingecko.com/api/v3/simple/price"
     params = {
         "ids": "bitcoin,ethereum,tether",
-        "vs_currencies": "usd,rub"
+        "vs_currencies": "usd"
     }
-
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url, params=params) as response:
-            data = await response.json()
-
+    data = requests.get(url, params=params).json()
     return (
-        "💰 КУРСЫ КРИПТО:\n\n"
-        f"₿ BTC:\n"
-        f"  💵 ${data['bitcoin']['usd']}\n"
-        f"  🇷🇺 {data['bitcoin']['rub']} ₽\n\n"
-
-        f"⧫ ETH:\n"
-        f"  💵 ${data['ethereum']['usd']}\n"
-        f"  🇷🇺 {data['ethereum']['rub']} ₽\n\n"
-
-        f"💲 USDT:\n"
-        f"  💵 ${data['tether']['usd']}\n"
-        f"  🇷🇺 {data['tether']['rub']} ₽"
+        f"💰 КУРСЫ КРИПТО:\n"
+        f"BTC: ${data['bitcoin']['usd']}\n"
+        f"ETH: ${data['ethereum']['usd']}\n"
+        f"USDT: ${data['tether']['usd']}"
     )
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "Привет! Напиши /crypto чтобы узнать курсы криптовалют в USD и RUB."
+        "Привет! Напиши /crypto чтобы узнать курсы криптовалют."
     )
 
 async def crypto(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    try:
-        prices = await get_crypto_prices()
-        await update.message.reply_text(prices)
-    except Exception:
-        await update.message.reply_text("❌ Ошибка при получении курсов")
+    prices = get_crypto_prices()
+    await update.message.reply_text(prices)
 
-app = ApplicationBu
+app = ApplicationBuilder().token(TOKEN).build()
+
+app.add_handler(CommandHandler("start", start))
+app.add_handler(CommandHandler("crypto", crypto))
+
+print("Бот запущен...")
+app.run_polling()
